@@ -43,6 +43,7 @@ public class Welcome extends Fragment {
         ArrayList<HashMap<String, Object>> getData();
         void deleteData(int pos,int position);
         void addClick();
+        void listClick(String title,String content);
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,6 +54,14 @@ public class Welcome extends Fragment {
         add.setOnClickListener(addOnClick);
         list = (ListView)view.findViewById(R.id.list_item);
         listItemAdapter=new MyAdapter(getContext());
+        //listData=((welcomeThing) getActivity()).getData();
+        listData=new ArrayList<HashMap<String, Object>>();
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("id","1121");
+        map.put("title", "sfafd");
+        map.put("content","sdfdsg");
+        map.put("date","sdgsfdg");
+        listData.add(map);
         list.setAdapter(listItemAdapter);
         list.setOnItemClickListener(listPress);
         list.setOnScrollListener(listScroll);
@@ -72,10 +81,7 @@ public class Welcome extends Fragment {
             String title=map.get("title").toString();
             String content=map.get("content").toString();
             ((welcomeThing) getActivity()).deleteData(pos, position);
-            EditText tit=(EditText)getActivity().findViewById(R.id.edtitle);
-            EditText con=(EditText)getActivity().findViewById(R.id.note);
-            tit.setText(title);
-            con.setText(content);
+            ((welcomeThing) getActivity()).listClick(title,content);
         }
     };
     private ImageButton.OnClickListener addOnClick=new ImageButton.OnClickListener(){
@@ -165,6 +171,7 @@ public class Welcome extends Fragment {
             View myView = mInflater.inflate(R.layout.item, null);
             holder = new ViewHolder();
             final MainActivity activity=(MainActivity)(getActivity());
+            listData=new ArrayList<HashMap<String, Object>>();
             listData=((welcomeThing) getActivity()).getData();
             holder.title = (TextView) myView.findViewById(R.id.title);
             holder.title.setText(listData.get(position).get("title").toString());
@@ -183,12 +190,11 @@ public class Welcome extends Fragment {
                     info.setNegativeButton("确定", new DialogInterface.OnClickListener() {
                         public void onClick(
                                 DialogInterface dialoginterface, int i) {
-                            //int mListPos = info.position;
                             HashMap<String, Object> map = listData
                                     .get(position);
                             int id = Integer.valueOf((map.get("id")
                                     .toString()));
-                                activity.delete(id,position);
+                            ((welcomeThing)getActivity()).deleteData(id,position);
                         }
                     });
                     info.setPositiveButton("取消", null);

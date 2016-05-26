@@ -29,42 +29,65 @@ public class MainActivity extends AppCompatActivity implements Edit.FOneBtnClick
     SQLiteDatabase mDb;
     SQLiteDatabaseDao dao;
     public ArrayList<HashMap<String, Object>> listData;
-    MyAdapter listItemAdapter;
     private Edit edit;
-    private Welcome welcome;
     FragmentManager manager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         dao =new SQLiteDatabaseDao();
-        manager=getSupportFragmentManager();
-        welcome=(Welcome)manager.findFragmentById(R.id.mainList);
+        Welcome welcome=new Welcome();
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.watching, welcome);
+        transaction.commit();
     }
     @Override
     public void onFOneBtnClick(String Title,String Content)
     {
         insert(Title, Content);
-        if (welcome == null)
-        {
-
-        }
+        Welcome welcome=new Welcome();
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.mainList,welcome);
+        transaction.replace(R.id.watching, welcome);
+        transaction.commit();
+    }
+    @Override
+    public void listClick(String title,String content){
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        edit=new Edit();
+        transaction.replace(R.id.watching, edit);
+        edit.listClickSet(title, content);
         transaction.commit();
     }
     @Override
     public void addClick(){
-        addNote();
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        edit=new Edit();
+        transaction.replace(R.id.watching,edit);
+        transaction.commit();
     }
     @Override
     public ArrayList<HashMap<String, Object>> getData(){
+        dao.getAllData("note");
         return listData;
     }
     @Override
     public void deleteData(int pos,int position){
-        delete(pos,position);
+        delete(pos, position);
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        Welcome welcome=new Welcome();
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.setCustomAnimations(
+                R.anim.push_left_in,
+                R.anim.push_left_out,
+                R.anim.push_left_in,
+                R.anim.push_left_out);
+        transaction.replace(R.id.watching, welcome);
+        transaction.commit();
     }
     @Override
     public void finish() {
@@ -78,15 +101,7 @@ public class MainActivity extends AppCompatActivity implements Edit.FOneBtnClick
     public void delete(int pos,int position){
         if (dao.delete(mDb, "note", pos)) {
             listData.remove(position);
-            listItemAdapter.notifyDataSetChanged();
         }
-    }
-    public  void addNote(){
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        edit=new Edit();
-        transaction.replace(R.id.mainList,edit);
-        transaction.commit();
     }
     public String time(){
         Date date=new Date();
@@ -142,70 +157,6 @@ public class MainActivity extends AppCompatActivity implements Edit.FOneBtnClick
                 return false;
             }
             return true;
-        }
-    }
-    class MyAdapter extends BaseAdapter {
-        private LayoutInflater mInflater;
-        public MyAdapter(Context context) {
-            this.mInflater = LayoutInflater.from(context);
-        }
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-        @Override
-        public int getCount() {
-            return listData.size();
-        }
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-        @Override
-        public View getView(final int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
-                View myView = mInflater.inflate(R.layout.item, null);
-                holder = new ViewHolder();
-                dao.getAllData("note");
-                holder.title = (TextView) myView.findViewById(R.id.title);
-                holder.title.setText(listData.get(position).get("title").toString());
-                holder.text = (TextView) myView.findViewById(R.id.content);
-                holder.text.setText(listData.get(position).get("content").toString());
-                holder.bt = (ImageButton) myView.findViewById(R.id.delete);
-                holder.date = (TextView) myView.findViewById(R.id.date);
-                holder.date.setText(listData.get(position).get("date").toString());
-            final int arg = position;
-            holder.bt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AlertDialog.Builder info=new AlertDialog.Builder(MainActivity.this);
-                    //info.setTitle("  ");
-                    info.setMessage("是否删除");
-                    info.setNegativeButton("确定", new DialogInterface.OnClickListener() {
-                        public void onClick(
-                                DialogInterface dialoginterface, int i) {
-                            //int mListPos = info.position;
-                            HashMap<String, Object> map = listData
-                                    .get(position);
-                            int id = Integer.valueOf((map.get("id")
-                                    .toString()));
-                            if (dao.delete(mDb, "note", id)) {
-                                listData.remove(position);
-                                listItemAdapter.notifyDataSetChanged();
-                            }
-                        }
-                    });
-                    info.setPositiveButton("取消", null);
-                    info.show();
-                }
-            });
-            return myView;
-        }
-        public final class ViewHolder {
-            public TextView title;
-            public TextView text;
-            public ImageButton bt;
-            public TextView date;
         }
     }
 }

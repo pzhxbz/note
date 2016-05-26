@@ -5,11 +5,8 @@
     android:layout_height="match_parent">
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <fragment
-            android:id="@+id/mainList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:name="com.example.pzhxbz.note.Welcome"/>
+        android:layout_height="match_parent"
+        android:id="@+id/watching">
+
     </FrameLayout>
 </LinearLayout>

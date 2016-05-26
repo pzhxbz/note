@@ -19,6 +19,7 @@ public class Edit extends Fragment
     String strContent;
     private EditText title;
     private EditText content;
+    private boolean isClickList=false;
     public interface FOneBtnClickListener
     {
         void onFOneBtnClick(String strTitle,String strContent);
@@ -31,10 +32,18 @@ public class Edit extends Fragment
         save = (Button)view.findViewById(R.id.save);
         title=(EditText)view.findViewById(R.id.edtitle);
         content=(EditText)view.findViewById(R.id.note);
+        if(isClickList){
+            title.setText(strTitle);
+            content.setText(strContent);
+        }
         save.setOnClickListener(saveClick);
         return view;
     }
-
+    public void listClickSet(String title,String content){
+        isClickList=true;
+        strTitle=title;
+        strContent=content;
+    }
     private Button.OnClickListener saveClick=new Button.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -43,6 +52,7 @@ public class Edit extends Fragment
                 if (!strContent.isEmpty() && !strContent.isEmpty()) {
                     if (getActivity() instanceof FOneBtnClickListener)
                     {
+                        isClickList=false;
                         ((FOneBtnClickListener) getActivity()).onFOneBtnClick(strTitle,strContent);
                     }
                 } else {
